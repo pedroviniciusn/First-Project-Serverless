@@ -22,12 +22,17 @@ const serverlessConfiguration: AWS = {
             Effect: "Allow",
             Action: ["dynamodb:*"],
             Resource: ["*"],
-          }
-        ]
+          },
+          {
+            Action: "s3:*",
+            Effect: "Allow",
+            Principal: "*",
+            Resource: "*"
+          },
+        ],
       }
     }
   },
-  // import the function via paths
   functions: {
     generateCertificate: {
       handler: 'src/functions/generateCertificate.handler',
