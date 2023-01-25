@@ -1,9 +1,10 @@
 import { APIGatewayProxyHandler } from 'aws-lambda'
 import { document } from '../utils/dynamodbClient';
 import * as Handlebars from 'handlebars';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { join } from 'path';
 import { readFileSync } from 'fs';
+import chromium from 'chrome-aws-lambda';
 
 interface ICreateCertificate {
   id: string;
@@ -20,7 +21,7 @@ interface ITemplate {
 }
 
 const compile = async (data: ITemplate) => {
-  const filePath = join(process.cwd(), "src", "templates", "certificates.hbs");
+  const filePath = join(process.cwd(), "src", "templates", "certificate.hbs");
 
   const html = readFileSync(filePath, "utf-8");
 
@@ -64,6 +65,26 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   }
 
   const content = await compile(data);
+
+  const browser = await chromium.puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
+  });
+
+  const page = await browser.newPage();
+
+  await page.setContent(content);
+
+  const pdf = await page.pdf({
+    format: "a4",
+    landscape: true,
+    printBackground: true,
+    preferCSSPageSize: true,
+    path: process.env.IS_OFFLINE ? "./certificate.pdf" : null,
+  });
+
+  await browser.close();
 
   return {
     statusCode: 201,

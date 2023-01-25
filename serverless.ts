@@ -15,14 +15,17 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
-    lambdaHashingVersion: "20201221",
-    iamRoleStatements: [
-      {
-        Effect: "Allow",
-        Action: ["dynamodb:*"],
-        Resource: ["*"],
+    iam: {
+      role: {
+        statements: [
+          {
+            Effect: "Allow",
+            Action: ["dynamodb:*"],
+            Resource: ["*"],
+          }
+        ]
       }
-    ]
+    }
   },
   // import the function via paths
   functions: {
@@ -50,6 +53,7 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
+      external: ["chrome-aws-lambda"]
     },
     dynamodb: {
       stages: ["dev", "local"],
