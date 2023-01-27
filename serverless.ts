@@ -1,7 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 const serverlessConfiguration: AWS = {
-  service: 'certificateignite',
+  service: 'certificateignite2023',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild', 'serverless-dynamodb-local','serverless-offline'],
   provider: {
@@ -58,7 +58,7 @@ const serverlessConfiguration: AWS = {
       ],
     }
    },
-  package: { individually: true },
+  package: { individually: false, include: ["./src/templates/**"] },
   custom: {
     esbuild: {
       bundle: true,
@@ -82,7 +82,7 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      dbCerticateUsers: {
+      dbCerticateUsersIgnite: {
         Type: "AWS::DynamoDB::Table",
         Properties: {
           TableName: "users_certificate",
